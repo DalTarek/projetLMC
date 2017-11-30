@@ -24,7 +24,7 @@ regle(X?=T, expand) :- compound(T), \+occur_check(X,T).
 regle(X?=T, check) :- X\=T, occur_check(X,T).
 regle(T?=X, orient) :- var(X), nonvar(T).
 regle(S?=T, decompose) :- functor(S,F1,A1), functor(T,F2,A2), F1==F2, A1==A2.
-% regle(S?=T, clash) :-
+regle(S?=T, clash) :- functor(S,F1,A1), functor(T,F2,A2), F1\=F2, A1\=A2.
 
 
 % Retourne vrai si la variable V apparaît dans le terme T, faux sinon
@@ -32,10 +32,10 @@ occur_check(V,T) :- var(T), contains_var(V,T).
 occur_check(V,T) :- compound(T), contains_term(V,T);
 
 
-reduit(rename,X?=T,P,Q) :- X=T.
-reduit(simplify,X?=T,P,Q) :- X=T.
-reduit(expand,X?=T,P,Q) :- X=T.
-reduit(check,X?=T,P,Q) :- X=T.
+reduit(rename,X?=T,[X?=T,Queue],Q) :- X=T, Q=Queue.
+reduit(simplify,X?=T,[X?=T,Queue],Q) :- X=T, Q=Queue.
+reduit(expand,X?=T,[X?=T,Queue],Q) :- X=T, Q=Queue.
+reduit(check,X?=T,[X?=T,Queue],Q) :- 
 reduit(orient,T?=X,P,Q) :-
 reduit(decompose,E,P,Q) :-
 reduit(clash,E,P,Q) :-
