@@ -24,8 +24,7 @@ regle(X?=T, expand) :- compound(T), \+occur_check(X,T).
 regle(X?=T, check) :- X\==T, occur_check(X,T).
 regle(T?=X, orient) :- nonvar(T), var(X).
 regle(S?=T, decompose) :- functor(S,F1,A1), functor(T,F2,A2), F1==F2, A1==A2.
-%Problème dans la règle clash
-%regle(S?=T, clash) :- functor(S,F1,A1), functor(T,F2,A2), F1\==F2, A1\==A2.
+regle(S?=T, clash) :- functor(S,F,A) \== functor(T,F,A).
 
 
 % Retourne vrai si la variable V apparaît dans le terme T, faux sinon
@@ -48,4 +47,4 @@ unifie([X?=T|Queue]) :- regle(X?=T,expand), reduit(expand,X?=T,[X?=T|Queue],Q), 
 unifie([X?=T]) :- regle(X?=T,check), fail.
 unifie([X?=T|Queue]) :- regle(X?=T,orient), reduit(orient,X?=T,[X?=T|Queue],Q), unifie(Q).
 %unifie([X?=T|Queue]) :- regle(X?=T,decompose), reduit(decompose,X?=T,[X?=T|Queue],Q), unifie(Q).
-%unifie([X?=T]) :- regle(X?=T,clash), fail.
+unifie([X?=T]) :- regle(X?=T,clash), fail.
