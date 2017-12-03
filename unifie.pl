@@ -15,8 +15,6 @@ echo(T) :- echo_on, !, write(T).
 echo(_).
 
 
-% \+ signifie not
-
 
 regle(X?=T, rename) :- var(X), var(T).
 regle(X?=T, simplify) :- var(X), atomic(T).
@@ -29,22 +27,31 @@ regle(S?=T, clash) :- functor(S,F,A) \== functor(T,F,A).
 
 % Retourne vrai si la variable V apparaît dans le terme T, faux sinon
 occur_check(V,T) :- var(V), var(T), V==T.
-occur_check(V,T) :- \+ subsumes_term(V,T).
-
+occur_check(V,T) :- \+subsumes_term(V,T).
 
 
 reduit(rename,X?=T,[X?=T|Queue],Q) :- X=T, Q=Queue.
 reduit(simplify,X?=T,[X?=T|Queue],Q) :- X=T, Q=Queue.
 reduit(expand,X?=T,[X?=T|Queue],Q) :- X=T, Q=Queue.
 reduit(orient,T?=X,[T?=X|Queue],Q) :- T=X, Q=Queue.
-%reduit(decompose,E,P,Q) :-
+reduit(decompose,S?=T,[S?=T|Queue],Q) :- S=..L1, T=..L2,
+	supprimer_premier_elem(L1,Res1), supprimer_premier_elem(L2,Res2),
+	decomposer_elem(Res1,Res2,Res),
+	append(Res,Queue,Q).
+
+% Supprime le premier élément d'une liste
+supprimer_premier_elem([_|Q],Res) :- Res=Q.
+
+% Permet de décomposer les éléments : ex: f(X)?=f(Y) donne X?=Y
+% append permet de concatener deux listes
+decomposer_elem([H1|Q1],[H2|Q2],Res) :- decomposer_elem(Q1,Q2,Res1), append([H1?=H2],Res1,Res).
 
 
 unifie([]) :- true.
 unifie([X?=T|Queue]) :- regle(X?=T,rename), reduit(rename,X?=T,[X?=T|Queue],Q), unifie(Q).
 unifie([X?=T|Queue]) :- regle(X?=T,simplify), reduit(simplify,X?=T,[X?=T|Queue],Q), unifie(Q).
 unifie([X?=T|Queue]) :- regle(X?=T,expand), reduit(expand,X?=T,[X?=T|Queue],Q), unifie(Q).
-unifie([X?=T]) :- regle(X?=T,check), fail.
+unifie([X?=T|_]) :- regle(X?=T,check), fail.
 unifie([X?=T|Queue]) :- regle(X?=T,orient), reduit(orient,X?=T,[X?=T|Queue],Q), unifie(Q).
-%unifie([X?=T|Queue]) :- regle(X?=T,decompose), reduit(decompose,X?=T,[X?=T|Queue],Q), unifie(Q).
-unifie([X?=T]) :- regle(X?=T,clash), fail.
+unifie([X?=T|Queue]) :- regle(X?=T,decompose), reduit(decompose,X?=T,[X?=T|Queue],Q), unifie(Q).
+unifie([X?=T|_]) :- regle(X?=T,clash), fail.
