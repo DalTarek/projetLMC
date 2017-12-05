@@ -21,8 +21,8 @@ regle(X?=T, simplify) :- var(X), atomic(T).
 regle(X?=T, expand) :- compound(T), \+occur_check(X,T).
 regle(X?=T, check) :- X\==T, occur_check(X,T).
 regle(T?=X, orient) :- nonvar(T), var(X).
-regle(S?=T, decompose) :- functor(S,F1,A1), functor(T,F2,A2), F1==F2, A1==A2.
-regle(S?=T, clash) :- functor(S,F,A) \== functor(T,F,A).
+regle(S?=T, decompose) :- compound(S), compound(T), functor(S,F1,A1), functor(T,F2,A2), F1==F2, A1==A2.
+regle(S?=T, clash) :- compound(S), compound(T), functor(S,F1,A1), functor(T,F2,A2), F1 == F2, A1 \== A2.
 
 
 % Retourne vrai si la variable V apparaît dans le terme T, faux sinon
