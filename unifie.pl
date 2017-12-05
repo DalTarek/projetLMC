@@ -45,6 +45,7 @@ supprimer_premier_elem([_|Q],Res) :- Res=Q.
 % Permet de décomposer les éléments : ex: f(X)?=f(Y) donne X?=Y
 % append permet de concatener deux listes
 decomposer_elem([H1|Q1],[H2|Q2],Res) :- decomposer_elem(Q1,Q2,Res1), append([H1?=H2],Res1,Res).
+decomposer_elem([],[],Res) :- Res = Res.
 
 
 unifie([]) :- true.
