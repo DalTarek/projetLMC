@@ -58,24 +58,27 @@ afficher_trace(P,E,R) :- echo('systeme:  '), echo(P), echo('\n'), echo(R), echo(
 % Stratégie choix_premier(P,E,R)
 % rename > simplify > expand > check > orient > decompose > clash 
 
-unifie([], choix_premier) :- true.
+unifie([],choix_premier) :- true.
 unifie(P,choix_premier) :- choix_premier(P,E,R), afficher_trace(P,E,R), reduit(R,E,P,Q), !, unifie(Q,choix_premier).
-
-% Choisit la règle dans l'ordre du prédicat regle
-choix_premier([E|_],E,R) :- regle(E,R).
 
 
 % Stratégie choix_pondere(P,E,R)
 % clash > check > rename > simplify > orient > decompose > expand
 
-unifie([], choix_pondere) :- true.
+unifie([],choix_pondere) :- true.
 unifie(P,choix_pondere) :- choix_pondere(P,E,R), afficher_trace(P,E,R), reduit(R,E,P,Q), !, unifie(Q,choix_pondere).
+
 
 % Classement des différentes règles du poids le plus fort au plus faible
 liste_regles([clash,check,rename,simplify,orient,decompose,expand]).
 
+
+% Choisit la règle dans l'ordre du prédicat regle
+choix_premier([E|_],E,R) :- regle(E,R),!.
+
+
 % Choisit la regle ayant le poids le plus élevé dans l'ordre donné dans la liste liste_regle
-choix_pondere(P,E,R) :- liste_regles(A), parcourir_regle(P,E,R,A).
+choix_pondere(P,E,R) :- liste_regles(A), parcourir_regle(P,E,R,A),!.
 
 parcourir_regle(P,E,R,A) :- parcourir_equation(P,E,R,A).
 parcourir_regle(P,E,R,[_|Queue]) :- parcourir_regle(P,E,R,Queue).
