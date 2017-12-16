@@ -41,7 +41,7 @@ occur_check(V,T) :- \+subsumes_term(V,T).
 reduit(rename,X?=T,P,Q) :- supprimer_elem(P,X?=T,Q), X=T.
 reduit(simplify,X?=T,P,Q) :- supprimer_elem(P,X?=T,Q), X=T.
 reduit(expand,X?=T,P,Q) :- supprimer_elem(P,X?=T,Q), X=T.
-reduit(orient,T?=X,P,Q) :- supprimer_elem(P,X?=T,Q), X=T.
+reduit(orient,T?=X,P,Q) :- supprimer_elem(P,T?=X,Q1), append([X?=T],Q1,Q).
 reduit(decompose,S?=T,[S?=T|Queue],Q) :- S=..L1, T=..L2,
 	supprimer_premier_elem(L1,Res1), supprimer_premier_elem(L2,Res2),
 	decomposer_elem(Res1,Res2,Res),
