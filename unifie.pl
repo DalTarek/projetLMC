@@ -20,6 +20,10 @@ unif(P,S) :- clr_echo, unifie(P,S).
 % trace_unif(P,S): active la trace d'affichage des règles
 trace_unif(P,S) :- set_echo, unifie(P,S).
 
+% Ecriture de la trace d'affichage
+afficher_trace(P,E,R) :- echo('systeme:  '), echo(P), echo('\n'), echo(R), echo(':  '), echo(E), echo('\n').
+
+
 % Définition du prédicat regle(E,R)
 regle(X?=T, rename) :- var(X), var(T).
 regle(X?=T, simplify) :- var(X), atomic(T).
@@ -34,16 +38,21 @@ occur_check(V,T) :- var(V), var(T), V==T.
 occur_check(V,T) :- \+subsumes_term(V,T).
 
 % Définition du prédicat reduit(R,E,P,Q)
-reduit(rename,X?=T,[X?=T|Queue],Q) :- X=T, Q=Queue.
-reduit(simplify,X?=T,[X?=T|Queue],Q) :- X=T, Q=Queue.
-reduit(expand,X?=T,[X?=T|Queue],Q) :- X=T, Q=Queue.
-reduit(orient,T?=X,[T?=X|Queue],Q) :- T=X, Q=Queue.
+reduit(rename,X?=T,P,Q) :- supprimer_elem(P,X?=T,Q), X=T.
+reduit(simplify,X?=T,P,Q) :- supprimer_elem(P,X?=T,Q), X=T.
+reduit(expand,X?=T,P,Q) :- supprimer_elem(P,X?=T,Q), X=T.
+reduit(orient,T?=X,P,Q) :- supprimer_elem(P,X?=T,Q), X=T.
 reduit(decompose,S?=T,[S?=T|Queue],Q) :- S=..L1, T=..L2,
 	supprimer_premier_elem(L1,Res1), supprimer_premier_elem(L2,Res2),
 	decomposer_elem(Res1,Res2,Res),
 	append(Res,Queue,Q).
 
-% Supprime le premier élément d'une liste
+% Supprime l'élément E d'une liste et retourne la nouvelle liste
+supprimer_elem([H|Q],E,Res) :- H\==E, append([H],Res1,Res), supprimer_elem(Q,E,Res1).
+supprimer_elem([E|Q],E,Res) :- supprimer_elem(Q,E,Res).
+supprimer_elem([],_,[]).
+	
+% Supprime le premier élément d'une liste et retourne la nouvelle liste
 supprimer_premier_elem([_|Q],Res) :- Res=Q.
 
 % Permet de décomposer les éléments : ex: f(X)?=f(Y) donne X?=Y
@@ -51,7 +60,6 @@ supprimer_premier_elem([_|Q],Res) :- Res=Q.
 decomposer_elem([H1|Q1],[H2|Q2],Res) :- decomposer_elem(Q1,Q2,Res1), append([H1?=H2],Res1,Res).
 decomposer_elem([],[],_).
 
-afficher_trace(P,E,R) :- echo('systeme:  '), echo(P), echo('\n'), echo(R), echo(':  '), echo(E), echo('\n').
 
 % Stratégies : 
 
