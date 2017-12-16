@@ -24,7 +24,7 @@ trace_unif(P,S) :- set_echo, unifie(P,S).
 regle(X?=T, rename) :- var(X), var(T).
 regle(X?=T, simplify) :- var(X), atomic(T).
 regle(X?=T, expand) :- var(X), compound(T), \+occur_check(X,T).
-regle(X?=T, check) :- X\==T, occur_check(X,T).
+regle(X?=T, check) :- var(X), X\==T, occur_check(X,T).
 regle(T?=X, orient) :- nonvar(T), var(X).
 regle(S?=T, decompose) :- compound(S), compound(T), functor(S,F1,A1), functor(T,F2,A2), F1==F2, A1==A2.
 regle(S?=T, clash) :- compound(S), compound(T), functor(S,F,A) \= functor(T,F,A).
@@ -69,16 +69,22 @@ unifie([],choix_pondere) :- true.
 unifie(P,choix_pondere) :- choix_pondere(P,E,R), afficher_trace(P,E,R), reduit(R,E,P,Q), !, unifie(Q,choix_pondere).
 
 
+% Stratégie choix_aleatoire(P,E,R)
+
+unifie([],choix_aleatoire) :- true.
+unifie(P,choix_aleatoire) :- choix_aleatoire(P,E,R), afficher_trace(P,E,R), reduit(R,E,P,Q), !, unifie(Q,choix_aleatoire).
+
+
 % Classement des différentes règles du poids le plus fort au plus faible
 liste_regles([clash,check,rename,simplify,orient,decompose,expand]).
 
 
 % Choisit la règle dans l'ordre du prédicat regle
-choix_premier([E|_],E,R) :- regle(E,R),!.
+choix_premier([E|_],E,R) :- regle(E,R), !.
 
 
 % Choisit la regle ayant le poids le plus élevé dans l'ordre donné dans la liste liste_regle
-choix_pondere(P,E,R) :- liste_regles(A), parcourir_regle(P,E,R,A),!.
+choix_pondere(P,E,R) :- liste_regles(A), parcourir_regle(P,E,R,A), !.
 
 parcourir_regle(P,E,R,A) :- parcourir_equation(P,E,R,A).
 parcourir_regle(P,E,R,[_|Queue]) :- parcourir_regle(P,E,R,Queue).
@@ -87,3 +93,6 @@ parcourir_equation([E|_],E,R,[R|_]) :- regle(E,R).
 parcourir_equation([_|Queue],E,R,A) :- parcourir_equation(Queue,E,R,A).
 parcourir_equation([],_,_,_) :- fail. 
 
+
+% Choisit une équation au hasard parmi les équations du système
+choix_aleatoire(P,E,R) :- random_member(E,P), regle(E,R), !.
