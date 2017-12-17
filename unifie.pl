@@ -104,3 +104,26 @@ parcourir_equation([],_,_,_) :- fail.
 
 % Choisit une équation au hasard parmi les équations du système
 choix_aleatoire(P,E,R) :- random_member(E,P), regle(E,R), !.
+
+
+% Affichage au démarrage du programme
+
+:- encoding(utf8).
+
+interface :- ansi_format([fg(red)],'Algorithme d\'unification de type Martelli-Montanari\n',[]),
+			 write('Utiliser le prédicat '),
+			 ansi_format([fg(blue)],'trace_unif(P,S)',[]),
+			 write(' pour activer la trace d\'affichage.\n'),
+			 write('Utiliser le prédicat '), 
+			 ansi_format([fg(blue)],'unif(P,S)',[]),
+			 write(' pour inhiber la trace d\'affichage.\n'),
+			 write('P est une liste d\'équations de type X?=T.\n'),
+			 write('S est une stratégie à choisir parmi '),
+			 ansi_format([fg(blue)],'choix_premier',[]),
+			 write(', '),
+			 ansi_format([fg(blue)],'choix_pondere',[]),
+			 write(' ou '),
+			 ansi_format([fg(blue)],'choix_aleatoire',[]),
+			 write('.\n').
+			 
+:- interface.
